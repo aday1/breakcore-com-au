@@ -1,0 +1,10 @@
+name = "breakcore-com-au"
+compatibility_date = "2026-05-09"
+account_id = "98b823762cb6be14fb4fb00c935fadf1"
+
+[assets]
+directory = "./public"
+
+[[routes]]
+pattern = "breakcore.com.au"
+custom_domain = true
