@@ -11,6 +11,8 @@
     code { background: #1a1a22; padding: 2px 6px; border-radius: 4px; font-size: 0.95em; }
     .muted { color: #8a8a9a; font-size: 0.9rem; }
     a { color: #7aa7ff; }
+    #deployMetaPanel { margin-top: 1.25rem; padding: 12px 14px; border: 1px solid #2a4a62; border-radius: 6px; background: #12121a; color: #c8d8e8; font: 11px/1.45 ui-monospace, Consolas, monospace; }
+    #deployMetaTitle { font-weight: 700; color: #e8eef8; margin: 0 0 8px; padding-bottom: 6px; border-bottom: 1px solid rgba(122,167,255,.35); letter-spacing: .06em; text-transform: uppercase; font-size: 11px; }
   </style>
 </head>
 <body>
@@ -19,22 +21,103 @@
     <p>Coming soon page for breakcore.com.au.</p>
     <p>Domain: <code>breakcore.com.au</code></p>
     <p class="muted">Hosted on Cloudflare. Source of truth: <a href="https://github.com/aday1/breakcore-com-au">github.com/aday1/breakcore-com-au</a></p>
-    <p class="muted" id="deployMetaLine">deploy metadata loading...</p>
+    <section id="deployMetaPanel" aria-label="deploy and build metadata">
+      <div id="deployMetaTitle">build info</div>
+      <div id="deployMetaBody">Loading deploy metadata...</div>
+    </section>
   </main>
   <script>
     (function () {
-      var line = document.getElementById("deployMetaLine");
-      if (!line) return;
-      fetch("./deploy-meta.json", { cache: "no-store" })
+      var META_URL = "./deploy-meta.json";
+      var bodyEl = document.getElementById("deployMetaBody");
+      if (!bodyEl) return;
+      function esc(s) {
+        return String(s === null || s === undefined ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+      }
+      function tzName() {
+        try {
+          return Intl.DateTimeFormat().resolvedOptions().timeZone || "";
+        } catch (eTz) {
+          return "";
+        }
+      }
+      function fmt(iso) {
+        if (!iso) return "(unknown)";
+        try {
+          var d = new Date(iso);
+          if (Number.isNaN(d.getTime())) return String(iso);
+          var main = d.toLocaleString(undefined, {
+            dateStyle: "medium",
+            timeStyle: "short",
+            timeZoneName: "short",
+          });
+          var iana = tzName();
+          if (iana) return main + " (" + iana + ")";
+          return main;
+        } catch (err) {
+          return String(iso);
+        }
+      }
+      function age(iso) {
+        if (!iso) return "";
+        var t = new Date(iso).getTime();
+        if (Number.isNaN(t)) return "";
+        var sec = Math.round((Date.now() - t) / 1000);
+        if (sec < -120) return "";
+        if (sec < 45) return "just now";
+        if (sec < 3600) return Math.round(sec / 60) + " min ago";
+        if (sec < 86400) return Math.round(sec / 3600) + " h ago";
+        if (sec < 604800) return Math.round(sec / 86400) + " d ago";
+        if (sec < 4233600) return Math.round(sec / 604800) + " wk ago";
+        var mo = Math.round(sec / (30.4375 * 86400));
+        if (mo < 24) return mo + " mo ago";
+        return Math.round(sec / (365.2425 * 86400)) + " yr ago";
+      }
+      function render(m) {
+        var sha = esc(m.last_git_sha_short || m.version || "?");
+        var gitHref = esc(m.last_git_url || m.changelog_url || "#");
+        var buildIso = m.last_build_at || m.build_date || "";
+        var depIso = m.last_deployed_at || m.last_build_at || m.build_date || "";
+        var ch = m.changelog_url || "";
+        var hist = m.commits_history_url || "";
+        var md = m.changelog_md_url || "";
+        var rel = m.releases_url || "";
+        var run = m.workflow_run_url || "";
+        var branch = esc(m.track || m.branch || "");
+        var note = m.deploy_note ? "<div style=\"opacity:.82;margin-top:6px;font-size:10px;\">" + esc(m.deploy_note) + "</div>" : "";
+        var title = document.getElementById("deployMetaTitle");
+        if (title) title.textContent = (m.site ? String(m.site).toUpperCase() : "SITE") + " // build info";
+        var html = "";
+        html += "<div style=\"margin:4px 0\"><strong>Last git:</strong> <a href=\"" + gitHref + "\" target=\"_blank\" rel=\"noopener noreferrer\">" + sha + "</a>";
+        if (branch) html += " <span style=\"opacity:.75\">(" + branch + ")</span>";
+        html += "</div>";
+        var ageB = age(buildIso);
+        var ageD = age(depIso);
+        var localTz = tzName();
+        if (localTz) html += "<div style=\"opacity:.78;margin:0 0 4px;font-size:10px\"><strong>Your timezone:</strong> " + esc(localTz) + "</div>";
+        html += "<div style=\"margin:4px 0\"><strong>Last build (CI):</strong> " + esc(fmt(buildIso));
+        if (ageB) html += " <span style=\"opacity:.82\"><strong>Age:</strong> " + esc(ageB) + "</span>";
+        html += "</div>";
+        html += "<div style=\"margin:4px 0\"><strong>Last deployed (CI push):</strong> " + esc(fmt(depIso));
+        if (ageD) html += " <span style=\"opacity:.82\"><strong>Age:</strong> " + esc(ageD) + "</span>";
+        if (run) html += " <a href=\"" + esc(run) + "\" target=\"_blank\" rel=\"noopener noreferrer\">workflow</a>";
+        html += "</div>";
+        var links = [];
+        if (ch) links.push("<a href=\"" + esc(ch) + "\" target=\"_blank\" rel=\"noopener noreferrer\">This commit</a>");
+        if (hist) links.push("<a href=\"" + esc(hist) + "\" target=\"_blank\" rel=\"noopener noreferrer\">Branch history</a>");
+        if (md) links.push("<a href=\"" + esc(md) + "\" target=\"_blank\" rel=\"noopener noreferrer\">CHANGELOG.md</a>");
+        if (rel) links.push("<a href=\"" + esc(rel) + "\" target=\"_blank\" rel=\"noopener noreferrer\">Releases</a>");
+        if (links.length) {
+          html += "<div style=\"margin:8px 0 0;padding-top:6px;border-top:1px solid rgba(122,167,255,.35)\"><strong>Changelog / history:</strong> " + links.join(" <span aria-hidden=\"true\">|</span> ") + "</div>";
+        }
+        html += note;
+        bodyEl.innerHTML = html;
+      }
+      fetch(META_URL, { cache: "no-store" })
         .then(function (r) { return r.ok ? r.json() : Promise.reject(new Error("missing")); })
-        .then(function (m) {
-          var dt = m.build_date ? new Date(m.build_date).toLocaleString() : "unknown-date";
-          var track = m.track || m.branch || "unknown-track";
-          var version = m.version || "unknown-version";
-          line.textContent = "Deploy: " + track + " | " + version + " | " + dt;
-        })
+        .then(render)
         .catch(function () {
-          line.textContent = "Deploy metadata unavailable.";
+          bodyEl.textContent = "Deploy metadata unavailable.";
         });
     })();
   </script>
