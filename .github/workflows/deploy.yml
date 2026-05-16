@@ -19,6 +19,22 @@ jobs:
         with:
           node-version: 20
 
+      - name: Write deploy metadata
+        run: |
+          SHORT_SHA="$(echo "$GITHUB_SHA" | cut -c1-12)"
+          BUILD_DATE="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          cat > public/deploy-meta.json <<EOF
+          {
+            "site": "breakcore.com.au",
+            "branch": "${GITHUB_REF_NAME}",
+            "track": "${GITHUB_REF_NAME}",
+            "version": "${SHORT_SHA}",
+            "build_date": "${BUILD_DATE}",
+            "run_id": "${GITHUB_RUN_ID}",
+            "run_number": "${GITHUB_RUN_NUMBER}"
+          }
+          EOF
+
       - name: Deploy via Wrangler
         uses: cloudflare/wrangler-action@v3
         with:

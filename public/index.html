@@ -19,6 +19,24 @@
     <p>Coming soon page for breakcore.com.au.</p>
     <p>Domain: <code>breakcore.com.au</code></p>
     <p class="muted">Hosted on Cloudflare. Source of truth: <a href="https://github.com/aday1/breakcore-com-au">github.com/aday1/breakcore-com-au</a></p>
+    <p class="muted" id="deployMetaLine">deploy metadata loading...</p>
   </main>
+  <script>
+    (function () {
+      var line = document.getElementById("deployMetaLine");
+      if (!line) return;
+      fetch("./deploy-meta.json", { cache: "no-store" })
+        .then(function (r) { return r.ok ? r.json() : Promise.reject(new Error("missing")); })
+        .then(function (m) {
+          var dt = m.build_date ? new Date(m.build_date).toLocaleString() : "unknown-date";
+          var track = m.track || m.branch || "unknown-track";
+          var version = m.version || "unknown-version";
+          line.textContent = "Deploy: " + track + " | " + version + " | " + dt;
+        })
+        .catch(function () {
+          line.textContent = "Deploy metadata unavailable.";
+        });
+    })();
+  </script>
 </body>
 </html>
