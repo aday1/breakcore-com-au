@@ -10,6 +10,19 @@ jobs:
   fix-dns:
     runs-on: ubuntu-latest
     steps:
+      - name: Registrar NS check (au RDAP)
+        run: |
+          set -e
+          echo "== registry nameservers =="
+          curl -sf "https://rdap.cctld.au/rdap/domain/breakcore.com.au" \
+            | jq -r '.nameservers[].ldhName' | tee /tmp/breakcore-ns.txt
+          if grep -qi 'cloudlare' /tmp/breakcore-ns.txt; then
+            echo "ERROR: registrar has typo cloudlare.com — must be karina.ns.cloudflare.com"
+            exit 1
+          fi
+          grep -q 'karina.ns.cloudflare.com' /tmp/breakcore-ns.txt
+          grep -q 'noah.ns.cloudflare.com' /tmp/breakcore-ns.txt
+
       - name: Zone status and activation check
         env:
           CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -21,8 +34,14 @@ jobs:
             https://api.cloudflare.com/client/v4/user/tokens/verify | jq .
 
           echo "== zone before =="
-          curl -sf -H "Authorization: Bearer $CF_TOKEN" \
-            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID" | jq '.result | {name, status, activated_on}'
+          STATUS=$(curl -sf -H "Authorization: Bearer $CF_TOKEN" \
+            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID" | tee /tmp/zone.json | jq -r '.result.status')
+          jq '.result | {name, status, activated_on, name_servers}' /tmp/zone.json
+
+          if [ "$STATUS" = "pending" ]; then
+            echo "ERROR: zone still pending — fix registrar NS first, then re-run"
+            exit 1
+          fi
 
           echo "== activation check =="
           curl -sf -X PUT -H "Authorization: Bearer $CF_TOKEN" \
@@ -44,8 +63,13 @@ jobs:
             local host="$1"
             echo "== fixing $host =="
             local records
-            records=$(curl -sf -H "Authorization: Bearer $CF_TOKEN" \
+            records=$(curl -s -H "Authorization: Bearer $CF_TOKEN" \
               "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records?name=${host}&per_page=50")
+            echo "$records" | jq -e '.success' >/dev/null || {
+              echo "DNS API failed (token needs Zone DNS Edit):"
+              echo "$records" | jq .
+              exit 1
+            }
             echo "$records" | jq '.result[] | {id, type, name, content, proxied}'
 
             echo "$records" | jq -r '.result[] | select(.type=="AAAA" and (.content=="100::" or (.content|startswith("100:")))) | .id' | while read -r id; do
