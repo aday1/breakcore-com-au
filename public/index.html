@@ -3,38 +3,89 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="breakcore.com.au community forum — offline for rebuild. Archive preserved.">
   <title>breakcore.com.au</title>
-  <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; margin: 0; padding: 0; background: #0b0b10; color: #e8e8ee; }
-    main { max-width: 720px; margin: 80px auto; padding: 0 24px; line-height: 1.6; }
-    h1 { font-size: 2rem; margin-bottom: 0.25rem; letter-spacing: -0.01em; }
-    code { background: #1a1a22; padding: 2px 6px; border-radius: 4px; font-size: 0.95em; }
-    .muted { color: #8a8a9a; font-size: 0.9rem; }
-    a { color: #7aa7ff; }
-  </style>
+  <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-  <main>
-    <h1>breakcore.com.au</h1>
-    <p>Coming soon page for breakcore.com.au.</p>
-    <p>Domain: <code>breakcore.com.au</code></p>
-    <p class="muted">Hosted on Cloudflare. Source of truth: <a href="https://github.com/aday1/breakcore-com-au">github.com/aday1/breakcore-com-au</a></p>
-  </main>
+  <div class="noise" aria-hidden="true"></div>
+  <div class="scanlines" aria-hidden="true"></div>
+
+  <div class="wrap">
+    <header class="hero">
+      <img class="hero-img" src="./assets/flyer.jpg" alt="Flyer scan from the old breakcore.com.au forum" width="980" height="340">
+      <div class="hero-body">
+        <p class="eyebrow">Server migration / forum rebuild</p>
+        <h1 class="title"><span class="glitch" data-text="breakcore.com.au">breakcore.com.au</span></h1>
+        <p class="lede">
+          The forum is <strong>offline while we rebuild</strong> — not gone, just stashed.
+          phpBB archive rescued from Sakura (May 2026). Same community, new stack, when DNS is live.
+        </p>
+        <ul class="stats">
+          <li>96 members</li>
+          <li>129 threads</li>
+          <li>292 posts</li>
+          <li>9 forums</li>
+          <li>40 attachments</li>
+        </ul>
+      </div>
+    </header>
+
+    <div class="avatars">
+      <img src="./assets/avatar-1.png" alt="" width="44" height="44">
+      <img src="./assets/avatar-2.png" alt="" width="44" height="44">
+      <img src="./assets/avatar-3.jpg" alt="" width="44" height="44">
+      <span>Avatars from the old board — still in the archive.</span>
+    </div>
+
+    <div class="grid">
+      <figure>
+        <img src="./assets/flyer-alt.jpg" alt="Event flyer from forum attachments" loading="lazy" width="200" height="120">
+        <figcaption>Events archive</figcaption>
+      </figure>
+      <figure>
+        <img src="./assets/cds.jpg" alt="CD artwork from forum uploads" loading="lazy" width="200" height="120">
+        <figcaption>Listening material</figcaption>
+      </figure>
+      <figure>
+        <img src="./assets/tote.jpg" alt="Merch photo from forum uploads" loading="lazy" width="200" height="120">
+        <figcaption>Scene ephemera</figcaption>
+      </figure>
+    </div>
+
+    <ul class="tags">
+      <li>Events</li>
+      <li>Production Notes</li>
+      <li>Listening Material</li>
+      <li>Artists + Labels</li>
+      <li>Sound Systems</li>
+      <li>Video + VJs</li>
+      <li>Speedcomp</li>
+      <li>Talk Rubbish</li>
+    </ul>
+
+    <p class="footer-note">
+      Flyers, merch photos, and avatars from the Sakura phpBB archive (May 2026).
+      Hosted on Cloudflare Workers. Source:
+      <a href="https://github.com/aday1/breakcore-com-au">github.com/aday1/breakcore-com-au</a>
+    </p>
+  </div>
+
   <div id="deployMetaDock" style="position:fixed;right:10px;bottom:10px;z-index:9999;max-width:min(420px,calc(100vw - 20px));font:11px/1.45 ui-monospace,Consolas,monospace;">
     <div id="deployMetaRestore" hidden style="margin-bottom:6px;text-align:right;">
-      <button type="button" id="deployMetaShowBtn" style="font:inherit;cursor:pointer;padding:4px 10px;border:1px solid #7aa7ff;background:rgba(0,0,0,.88);color:#c8d8e8;border-radius:3px;box-shadow:0 2px 10px rgba(0,0,0,.45);">build info</button>
+      <button type="button" id="deployMetaShowBtn" style="font:inherit;cursor:pointer;padding:4px 10px;border:1px solid #00ffd5;background:rgba(0,0,0,.88);color:#c8d8e8;border-radius:3px;box-shadow:0 2px 10px rgba(0,0,0,.45);">build info</button>
     </div>
     <div id="deployMetaPanel" role="region" aria-label="Build metadata" style="border:1px solid #2a4a62;background:#12121a;color:#c8d8e8;box-sizing:border-box;border-radius:6px;box-shadow:0 4px 18px rgba(0,0,0,.55);">
       <div id="deployMetaBar" tabindex="0" role="button" aria-expanded="false" style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 8px;cursor:pointer;user-select:none;">
         <span id="deployMetaSummary" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Loading...</span>
         <span id="deployMetaExpandGlyph" style="opacity:.85;flex-shrink:0;font-weight:700;">[+]</span>
-        <button type="button" id="deployMetaHideBtn" style="flex-shrink:0;font:inherit;cursor:pointer;padding:2px 6px;margin:0;border:1px solid rgba(122,167,255,.55);background:transparent;color:#c8d8e8;border-radius:2px;">hide</button>
+        <button type="button" id="deployMetaHideBtn" style="flex-shrink:0;font:inherit;cursor:pointer;padding:2px 6px;margin:0;border:1px solid rgba(0,255,213,.55);background:transparent;color:#c8d8e8;border-radius:2px;">hide</button>
       </div>
       <div id="deployMetaDetail" hidden style="padding:10px 12px;padding-top:0;font:11px/1.45 ui-monospace,Consolas,monospace;">
-        <div id="deployMetaTitle" style="font-weight:700;color:#e8eef8;margin:0 0 8px;padding-bottom:6px;border-bottom:1px solid rgba(122,167,255,.35);letter-spacing:.06em;text-transform:uppercase;font-size:11px;">build info</div>
+        <div id="deployMetaTitle" style="font-weight:700;color:#e8eef8;margin:0 0 8px;padding-bottom:6px;border-bottom:1px solid rgba(0,255,213,.35);letter-spacing:.06em;text-transform:uppercase;font-size:11px;">build info</div>
         <div id="deployMetaBody">Loading deploy metadata...</div>
         <div style="margin-top:8px;">
-          <button type="button" id="deployMetaCollapseBtn" style="font:inherit;cursor:pointer;padding:3px 8px;border:1px solid rgba(122,167,255,.55);background:transparent;color:#c8d8e8;border-radius:2px;">collapse</button>
+          <button type="button" id="deployMetaCollapseBtn" style="font:inherit;cursor:pointer;padding:3px 8px;border:1px solid rgba(0,255,213,.55);background:transparent;color:#c8d8e8;border-radius:2px;">collapse</button>
         </div>
       </div>
     </div>
@@ -84,22 +135,10 @@
           }
         }
       }
-      function expand() {
-        uiSave("expanded");
-        syncUi("expanded");
-      }
-      function collapse() {
-        uiSave("collapsed");
-        syncUi("collapsed");
-      }
-      function hideDock() {
-        uiSave("hidden");
-        syncUi("hidden");
-      }
-      function showDock() {
-        uiSave("collapsed");
-        syncUi("collapsed");
-      }
+      function expand() { uiSave("expanded"); syncUi("expanded"); }
+      function collapse() { uiSave("collapsed"); syncUi("collapsed"); }
+      function hideDock() { uiSave("hidden"); syncUi("hidden"); }
+      function showDock() { uiSave("collapsed"); syncUi("collapsed"); }
       bar.addEventListener("click", function (ev) {
         if (ev.target && ev.target.closest && ev.target.closest("#deployMetaHideBtn")) return;
         if (detailEl.hidden) expand(); else collapse();
@@ -110,42 +149,25 @@
         ev.preventDefault();
         if (detailEl.hidden) expand(); else collapse();
       });
-      hideBtn.addEventListener("click", function (ev) {
-        ev.stopPropagation();
-        hideDock();
-      });
-      collapseBtn.addEventListener("click", function (ev) {
-        ev.stopPropagation();
-        collapse();
-      });
+      hideBtn.addEventListener("click", function (ev) { ev.stopPropagation(); hideDock(); });
+      collapseBtn.addEventListener("click", function (ev) { ev.stopPropagation(); collapse(); });
       showBtn.addEventListener("click", showDock);
       syncUi(uiLoad());
       function esc(s) {
         return String(s === null || s === undefined ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
       }
       function tzName() {
-        try {
-          return Intl.DateTimeFormat().resolvedOptions().timeZone || "";
-        } catch (eTz) {
-          return "";
-        }
+        try { return Intl.DateTimeFormat().resolvedOptions().timeZone || ""; } catch (eTz) { return ""; }
       }
       function fmt(iso) {
         if (!iso) return "(unknown)";
         try {
           var d = new Date(iso);
           if (Number.isNaN(d.getTime())) return String(iso);
-          var main = d.toLocaleString(undefined, {
-            dateStyle: "medium",
-            timeStyle: "short",
-            timeZoneName: "short",
-          });
+          var main = d.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short", timeZoneName: "short" });
           var iana = tzName();
-          if (iana) return main + " (" + iana + ")";
-          return main;
-        } catch (err) {
-          return String(iso);
-        }
+          return iana ? main + " (" + iana + ")" : main;
+        } catch (err) { return String(iso); }
       }
       function age(iso, kind) {
         if (!iso) return "";
@@ -170,9 +192,7 @@
         var ageB = age(buildIso, "build");
         var ageD = age(depIso, "deploy");
         var siteLab = (m.site ? String(m.site) : "").toUpperCase().replace(/\s+/g, "") || "SITE";
-        var sumParts = [siteLab, String(shaRaw)];
-        if (ageB) sumParts.push(ageB);
-        summaryEl.textContent = sumParts.join(" | ");
+        summaryEl.textContent = [siteLab, String(shaRaw), ageB].filter(Boolean).join(" | ");
         var sha = esc(shaRaw);
         var gitHref = esc(m.last_git_url || m.changelog_url || "#");
         var ch = m.changelog_url || "";
@@ -203,7 +223,7 @@
         if (md) links.push("<a href=\"" + esc(md) + "\" target=\"_blank\" rel=\"noopener noreferrer\">CHANGELOG.md</a>");
         if (rel) links.push("<a href=\"" + esc(rel) + "\" target=\"_blank\" rel=\"noopener noreferrer\">Releases</a>");
         if (links.length) {
-          html += "<div style=\"margin:8px 0 0;padding-top:6px;border-top:1px solid rgba(122,167,255,.35)\"><strong>Changelog / history:</strong> " + links.join(" <span aria-hidden=\"true\">|</span> ") + "</div>";
+          html += "<div style=\"margin:8px 0 0;padding-top:6px;border-top:1px solid rgba(0,255,213,.35)\"><strong>Changelog / history:</strong> " + links.join(" <span aria-hidden=\"true\">|</span> ") + "</div>";
         }
         html += note;
         bodyEl.innerHTML = html;
