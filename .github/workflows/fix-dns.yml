@@ -1,0 +1,81 @@
+name: Fix breakcore DNS
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fix-dns:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Zone status and activation check
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          ZONE_ID: 20c5965ba229c7c11586f502875394e4
+        run: |
+          set -e
+          echo "== token verify =="
+          curl -sf -H "Authorization: Bearer $CF_TOKEN" \
+            https://api.cloudflare.com/client/v4/user/tokens/verify | jq .
+
+          echo "== zone before =="
+          curl -sf -H "Authorization: Bearer $CF_TOKEN" \
+            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID" | jq '.result | {name, status, activated_on}'
+
+          echo "== activation check =="
+          curl -sf -X PUT -H "Authorization: Bearer $CF_TOKEN" \
+            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/activation_check" | jq .
+
+          sleep 10
+
+          echo "== zone after =="
+          curl -sf -H "Authorization: Bearer $CF_TOKEN" \
+            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID" | jq '.result | {name, status, activated_on}'
+
+      - name: Fix apex and beta DNS records
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          ZONE_ID: 20c5965ba229c7c11586f502875394e4
+        run: |
+          set -e
+          fix_host() {
+            local host="$1"
+            echo "== fixing $host =="
+            local records
+            records=$(curl -sf -H "Authorization: Bearer $CF_TOKEN" \
+              "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records?name=${host}&per_page=50")
+            echo "$records" | jq '.result[] | {id, type, name, content, proxied}'
+
+            echo "$records" | jq -r '.result[] | select(.type=="AAAA" and (.content=="100::" or (.content|startswith("100:")))) | .id' | while read -r id; do
+              [ -z "$id" ] && continue
+              echo "delete bad AAAA $id"
+              curl -sf -X DELETE -H "Authorization: Bearer $CF_TOKEN" \
+                "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records/$id" | jq .
+            done
+
+            if ! echo "$records" | jq -e '.result[] | select(.type=="A")' >/dev/null; then
+              echo "add proxied A 192.0.2.0 for $host"
+              curl -sf -X POST -H "Authorization: Bearer $CF_TOKEN" -H "Content-Type: application/json" \
+                "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records" \
+                -d "{\"type\":\"A\",\"name\":\"${host}\",\"content\":\"192.0.2.0\",\"ttl\":1,\"proxied\":true}" | jq .
+            fi
+          }
+
+          fix_host "breakcore.com.au"
+          fix_host "beta.breakcore.com.au"
+
+          echo "== final records =="
+          curl -sf -H "Authorization: Bearer $CF_TOKEN" \
+            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records?per_page=100" \
+            | jq '.result[] | select(.name|test("breakcore")) | {type, name, content, proxied}'
+
+      - name: Smoke test
+        run: |
+          sleep 20
+          dig +short breakcore.com.au @karina.ns.cloudflare.com A
+          dig +short breakcore.com.au @karina.ns.cloudflare.com AAAA
+          dig +short beta.breakcore.com.au @karina.ns.cloudflare.com A
+          curl -sI --max-time 20 https://breakcore.com.au/ | head -5 || true
+          curl -sI --max-time 20 https://beta.breakcore.com.au/ | head -5 || true
