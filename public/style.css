@@ -28,7 +28,7 @@ body {
   background-position: center center;
   background-size: cover;
   background-repeat: no-repeat;
-  background-image: url("./assets/collage.jpg");
+  background-image: url("./assets/collages/remix-desktop.jpg");
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.4s ease;
@@ -40,14 +40,14 @@ body {
 
 @media (orientation: portrait) and (max-width: 899px) {
   .collage-bg {
-    background-image: url("./assets/collage-mobile.jpg");
+    background-image: url("./assets/collages/remix-mobile.jpg");
     background-position: center 38%;
   }
 }
 
 @media (min-width: 900px) {
   .collage-bg {
-    background-image: url("./assets/collage-full.jpg");
+    background-image: url("./assets/collages/remix-desktop.jpg");
     background-position: center 40%;
   }
 }

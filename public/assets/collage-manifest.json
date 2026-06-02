@@ -1,0 +1,14 @@
+{
+  "variants": [
+    "remix",
+    "grid",
+    "slice",
+    "scatter",
+    "flyers"
+  ],
+  "cycleSec": 9,
+  "fadeSec": 1.4,
+  "pathTemplate": "./assets/collages/{variant}-{suffix}.jpg",
+  "suffixDesktop": "desktop",
+  "suffixMobile": "mobile"
+}
