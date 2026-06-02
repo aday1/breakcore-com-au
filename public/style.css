@@ -17,19 +17,38 @@ body {
   font-family: "Segoe UI", Arial, sans-serif;
   line-height: 1.5;
   overflow-x: hidden;
+  min-height: 100dvh;
 }
 
 .collage-bg {
   position: fixed;
   inset: 0;
   z-index: 0;
-  background: #08080c url("./assets/collage.jpg") center / cover no-repeat;
+  background-color: #08080c;
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-image: url("./assets/collage.jpg");
+  opacity: 0;
+  pointer-events: none;
   transition: opacity 0.4s ease;
+}
+
+.collage-bg.visible {
+  opacity: 1;
+}
+
+@media (orientation: portrait) and (max-width: 899px) {
+  .collage-bg {
+    background-image: url("./assets/collage-mobile.jpg");
+    background-position: center 38%;
+  }
 }
 
 @media (min-width: 900px) {
   .collage-bg {
     background-image: url("./assets/collage-full.jpg");
+    background-position: center 40%;
   }
 }
 
@@ -39,6 +58,7 @@ body {
   z-index: 0;
   width: 100%;
   height: 100%;
+  min-height: 100dvh;
   display: block;
   opacity: 0;
   transition: opacity 0.35s ease;
@@ -112,12 +132,38 @@ body {
 .page {
   position: relative;
   z-index: 3;
-  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 32px 24px 100px;
+  padding: max(24px, env(safe-area-inset-top)) 20px max(88px, calc(72px + env(safe-area-inset-bottom))) 20px;
   max-width: 920px;
+}
+
+@media (max-width: 899px) {
+  .page {
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
+  }
+
+  .title {
+    font-size: clamp(2rem, 12vw, 3rem);
+    line-height: 0.95;
+  }
+
+  .shader-fx {
+    opacity: 0.22;
+  }
+
+  .scanlines {
+    opacity: 0.4;
+  }
+
+  #deployMetaDock {
+    left: 10px !important;
+    right: 10px !important;
+    max-width: none !important;
+  }
 }
 
 .eyebrow {
