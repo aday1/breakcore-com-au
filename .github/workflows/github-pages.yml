@@ -1,0 +1,59 @@
+name: GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "public/**"
+      - ".github/workflows/github-pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Write deploy metadata
+        run: |
+          SHORT_SHA="$(echo "$GITHUB_SHA" | cut -c1-12)"
+          BUILD_DATE="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          cat > public/deploy-meta.json <<EOF
+          {
+            "site": "breakcore.com.au",
+            "branch": "${GITHUB_REF_NAME}",
+            "track": "${GITHUB_REF_NAME}",
+            "version": "${SHORT_SHA}",
+            "build_date": "${BUILD_DATE}",
+            "last_git_sha_short": "${SHORT_SHA}",
+            "last_git_sha": "${GITHUB_SHA}",
+            "last_git_url": "https://github.com/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}",
+            "last_build_at": "${BUILD_DATE}",
+            "last_deployed_at": "${BUILD_DATE}",
+            "changelog_url": "https://github.com/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}",
+            "commits_history_url": "https://github.com/${GITHUB_REPOSITORY}/commits/${GITHUB_REF_NAME}",
+            "workflow_run_url": "https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}",
+            "deploy_note": "GitHub Pages preview until breakcore.com.au DNS is active"
+          }
+          EOF
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+      - uses: actions/deploy-pages@v4
+        id: deployment

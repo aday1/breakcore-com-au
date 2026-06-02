@@ -217,6 +217,18 @@ body {
 
 .footer-note a { color: var(--cyan); }
 
+.gh-preview-bar {
+  font: 600 11px/1.35 ui-monospace, Consolas, monospace;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin: 0 0 18px;
+  padding: 10px 12px;
+  border: 1px solid rgba(0, 255, 213, 0.55);
+  background: rgba(0, 0, 0, 0.72);
+  color: var(--cyan);
+  max-width: 36em;
+}
+
 .beta .collage-bg::after {
   background:
     linear-gradient(180deg, rgba(20, 0, 12, 0.5) 0%, rgba(5, 5, 8, 0.85) 100%),

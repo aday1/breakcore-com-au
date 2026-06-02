@@ -1,33 +1,9 @@
-﻿# breakcore.com.au
+﻿Forum rebuild placeholder for breakcore.com.au.
 
-Coming soon page for breakcore.com.au.
+## Preview (share while DNS is pending)
 
-## Source of truth
+- GitHub Pages: https://aday1.github.io/breakcore-com-au/
+- Cloudflare (when DNS active): https://breakcore.com.au/
+- Local: `python -m http.server 8770` in `public/` (avoid port 8765 — Bitwig MCP)
 
-Edit files under [public/](./public). Pushing to main deploys to Cloudflare via GitHub Actions.
-
-`
-public/
-  index.html        <- the page
-  _headers          <- Cloudflare-style security headers
-wrangler.toml       <- Cloudflare Worker + assets config
-.github/workflows/  <- deploy on push
-`
-
-## One-time secret setup
-
-This repo needs one GitHub secret to deploy:
-
-- CLOUDFLARE_API_TOKEN - create at https://dash.cloudflare.com/profile/api-tokens with the
-  "Edit Cloudflare Workers" template scoped to the account containing zone breakcore.com.au.
-  Add to this repo: Settings -> Secrets and variables -> Actions -> New repository secret.
-
-After the secret is set, every push to main deploys automatically.
-
-## Local preview
-
-`
-npx wrangler dev
-`
-
-Visit http://localhost:8787 to preview.
+Edit files under [public/](./public). Push to `main` deploys to Cloudflare Workers and GitHub Pages.

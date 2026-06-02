@@ -1,0 +1,11 @@
+{
+  "site": "breakcore.com.au",
+  "branch": "main",
+  "track": "main",
+  "version": "local",
+  "build_date": "2026-06-02T00:00:00Z",
+  "last_build_at": "2026-06-02T00:00:00Z",
+  "last_deployed_at": "2026-06-02T00:00:00Z",
+  "last_git_sha_short": "local",
+  "last_git_url": "https://github.com/aday1/breakcore-com-au"
+}
